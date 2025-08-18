@@ -1,12 +1,13 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Animator), typeof(SpriteRenderer))]
+[RequireComponent(typeof(Animator), typeof(SpriteRenderer), typeof(Rigidbody2D))]
 public class PlayerMovement : MonoBehaviour
 {
     public float moveSpeed = 5f;
 
     private Animator animator;
     private SpriteRenderer spriteRenderer;
+    private Rigidbody2D rb;
     private Vector2 movement;
     private string lastDirection = "Down"; // 最後の向きを記録
 
@@ -14,6 +15,9 @@ public class PlayerMovement : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        rb = GetComponent<Rigidbody2D>();
+        rb.gravityScale = 0; // 重力不要
+        rb.freezeRotation = true;
     }
 
     void Update()
@@ -22,11 +26,7 @@ public class PlayerMovement : MonoBehaviour
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
 
-        Vector2 normalizedMovement = movement.normalized;
-
-        // 移動
-        transform.position += new Vector3(normalizedMovement.x, normalizedMovement.y, 0) * moveSpeed * Time.deltaTime;
-
+        // Animatorと向き判定
         if (movement != Vector2.zero)
         {
             animator.SetBool("isWalking", true);
@@ -35,12 +35,10 @@ public class PlayerMovement : MonoBehaviour
             {
                 lastDirection = (movement.x > 0) ? "Right" : "Left";
 
-                // 左向きスプライト基準でAnimatorに渡す
-                animator.SetFloat("moveX", 1); // 左向きアニメを基準
+                animator.SetFloat("moveX", 1); // 左向きアニメ基準
                 animator.SetFloat("moveY", 0);
 
-                // 左向きスプライトを左右反転
-                spriteRenderer.flipX = movement.x > 0; // 右移動なら反転
+                spriteRenderer.flipX = movement.x > 0; // 右なら反転
             }
             else
             {
@@ -49,7 +47,7 @@ public class PlayerMovement : MonoBehaviour
                 animator.SetFloat("moveX", 0);
                 animator.SetFloat("moveY", movement.y > 0 ? 1 : -1);
 
-                spriteRenderer.flipX = false; // 上下は反転不要
+                spriteRenderer.flipX = false;
             }
         }
         else
@@ -69,16 +67,24 @@ public class PlayerMovement : MonoBehaviour
                     spriteRenderer.flipX = false;
                     break;
                 case "Right":
-                    animator.SetFloat("moveX", 1);  // 左向きアニメ基準
+                    animator.SetFloat("moveX", 1); // 左向きアニメ基準
                     animator.SetFloat("moveY", 0);
-                    spriteRenderer.flipX = true;   // 左向きスプライトを右向きに
+                    spriteRenderer.flipX = true;
                     break;
                 case "Left":
-                    animator.SetFloat("moveX", 1);  // 左向きアニメ基準
+                    animator.SetFloat("moveX", 1); // 左向きアニメ基準
                     animator.SetFloat("moveY", 0);
-                    spriteRenderer.flipX = false;  // 左向きスプライト
+                    spriteRenderer.flipX = false;
                     break;
             }
         }
+    }
+
+    void FixedUpdate()
+    {
+        // Rigidbodyで移動（衝突を考慮）
+        Vector2 normalizedMovement = movement.normalized;
+        Vector2 newPos = rb.position + normalizedMovement * moveSpeed * Time.fixedDeltaTime;
+        rb.MovePosition(newPos);
     }
 }
