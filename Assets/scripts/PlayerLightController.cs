@@ -3,8 +3,7 @@ using UnityEngine.Rendering.Universal;
 
 public class PlayerLightController : MonoBehaviour
 {
-    public Light2D playerLight;              // 見た目のライト
-    public CircleCollider2D visionCollider;  // 敵感知用コライダー
+    public Light2D playerLight;              // 見た目のライ
 
     public float smallRadius = 3f;
     public float largeRadius = 6f;
@@ -22,9 +21,7 @@ public class PlayerLightController : MonoBehaviour
             if (playerLight != null)
                 playerLight.pointLightOuterRadius = radius;
 
-            // 敵感知範囲も同じ半径に変更
-            if (visionCollider != null)
-                visionCollider.radius = radius;
+            
         }
     }
 }
