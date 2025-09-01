@@ -11,12 +11,12 @@ public class PlayerLife : MonoBehaviour
     public float blinkInterval = 0.2f;
 
     [Header("Circular Time Meter")]
-    public Image fillImage;           // 円形 Fill Image
-    public float totalTime = 100f;    // 最大値
-    public float timeDecreasePerSecond = 1f; // 毎秒減る値
-    public float deathPenalty = 10f;  // 死亡時に減る値
+    public Image fillImage;
+    public float totalTime = 100f;
+    public float timeDecreasePerSecond = 1f;
+    public float deathPenalty = 10f;
 
-    private float currentTime;
+    [HideInInspector] public float currentTime;
     private bool isDead = false;
     private bool isInvincible = false;
     private SpriteRenderer spriteRenderer;
@@ -66,7 +66,8 @@ public class PlayerLife : MonoBehaviour
         }
     }
 
-    private void ReduceTime(float amount)
+    // ← public に変更
+    public void ReduceTime(float amount)
     {
         currentTime = Mathf.Max(0, currentTime - amount);
         UpdateMeter();
@@ -80,27 +81,23 @@ public class PlayerLife : MonoBehaviour
     private void GameOver()
     {
         Debug.Log("Game Over!");
-        // ここにゲームオーバー処理（UI表示やシーン切替）を追加
     }
 
     private IEnumerator DeathAndRespawn()
     {
         isDead = true;
 
-        // 死亡演出
         mainCollider.enabled = false;
         rb.simulated = false;
         spriteRenderer.enabled = false;
 
         yield return new WaitForSeconds(respawnDelay);
 
-        // リスポーン
         transform.position = respawnPosition;
         mainCollider.enabled = true;
         rb.simulated = true;
         spriteRenderer.enabled = true;
 
-        // 無敵時間開始
         isInvincible = true;
         StartCoroutine(InvincibleBlink());
 

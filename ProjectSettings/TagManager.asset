@@ -13,7 +13,7 @@ TagManager:
   - Wall
   - Water
   - UI
-  - 
+  - enemy
   - 
   - 
   - 
@@ -51,4 +51,7 @@ TagManager:
     locked: 0
   - name: Characters
     uniqueID: 3311511903
+    locked: 0
+  - name: Foreground
+    uniqueID: 3117977753
     locked: 0

@@ -11,22 +11,35 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 movement;
     private string lastDirection = "Down"; // 最後の向きを記録
 
+    [HideInInspector] public bool canMove = true; // 攻撃中に移動停止用
+
     void Start()
     {
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
-        rb.gravityScale = 0; // 重力不要
+        rb.gravityScale = 0;
         rb.freezeRotation = true;
     }
 
     void Update()
     {
-        // 入力取得
+        // ---------------------------
+        // 攻撃中は入力スキップ
+        // ---------------------------
+        if (!canMove)
+        {
+            animator.SetBool("isWalking", false);
+            ApplyLastDirection(); // 向きだけ維持
+            return;
+        }
+
+        // ---------------------------
+        // 通常の入力処理
+        // ---------------------------
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
 
-        // Animatorと向き判定
         if (movement != Vector2.zero)
         {
             animator.SetBool("isWalking", true);
@@ -35,10 +48,10 @@ public class PlayerMovement : MonoBehaviour
             {
                 lastDirection = (movement.x > 0) ? "Right" : "Left";
 
-                animator.SetFloat("moveX", 1); // 左向きアニメ基準
+                animator.SetFloat("moveX", 1);
                 animator.SetFloat("moveY", 0);
 
-                spriteRenderer.flipX = movement.x > 0; // 右なら反転
+                spriteRenderer.flipX = movement.x > 0;
             }
             else
             {
@@ -53,38 +66,45 @@ public class PlayerMovement : MonoBehaviour
         else
         {
             animator.SetBool("isWalking", false);
-
-            switch (lastDirection)
-            {
-                case "Up":
-                    animator.SetFloat("moveX", 0);
-                    animator.SetFloat("moveY", 1);
-                    spriteRenderer.flipX = false;
-                    break;
-                case "Down":
-                    animator.SetFloat("moveX", 0);
-                    animator.SetFloat("moveY", -1);
-                    spriteRenderer.flipX = false;
-                    break;
-                case "Right":
-                    animator.SetFloat("moveX", 1); // 左向きアニメ基準
-                    animator.SetFloat("moveY", 0);
-                    spriteRenderer.flipX = true;
-                    break;
-                case "Left":
-                    animator.SetFloat("moveX", 1); // 左向きアニメ基準
-                    animator.SetFloat("moveY", 0);
-                    spriteRenderer.flipX = false;
-                    break;
-            }
+            ApplyLastDirection(); // 停止中も向き維持
         }
     }
 
     void FixedUpdate()
     {
-        // Rigidbodyで移動（衝突を考慮）
+        if (!canMove) return; // 攻撃中は移動停止
+
         Vector2 normalizedMovement = movement.normalized;
-        Vector2 newPos = rb.position + normalizedMovement * moveSpeed * Time.fixedDeltaTime;
-        rb.MovePosition(newPos);
+        rb.MovePosition(rb.position + normalizedMovement * moveSpeed * Time.fixedDeltaTime);
+    }
+
+    /// <summary>
+    /// lastDirection に応じて Animator と flipX を更新
+    /// </summary>
+    private void ApplyLastDirection()
+    {
+        switch (lastDirection)
+        {
+            case "Up":
+                animator.SetFloat("moveX", 0);
+                animator.SetFloat("moveY", 1);
+                spriteRenderer.flipX = false;
+                break;
+            case "Down":
+                animator.SetFloat("moveX", 0);
+                animator.SetFloat("moveY", -1);
+                spriteRenderer.flipX = false;
+                break;
+            case "Right":
+                animator.SetFloat("moveX", 1);
+                animator.SetFloat("moveY", 0);
+                spriteRenderer.flipX = true;
+                break;
+            case "Left":
+                animator.SetFloat("moveX", 1);
+                animator.SetFloat("moveY", 0);
+                spriteRenderer.flipX = false;
+                break;
+        }
     }
 }
