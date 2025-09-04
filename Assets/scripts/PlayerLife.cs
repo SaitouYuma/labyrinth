@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class PlayerLife : MonoBehaviour
 {
@@ -91,7 +92,14 @@ public class PlayerLife : MonoBehaviour
 
     private void GameOver()
     {
-        Debug.Log("Game Over!");
+        Time.timeScale = 0;
+
+        // フェードアウト開始
+        ScreenFader fader = FindObjectOfType<ScreenFader>();
+        if (fader != null)
+        {
+            fader.FadeOutAndLoad("GameOverScene");
+        }
     }
 
     private IEnumerator DeathAndRespawn()
