@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 
@@ -16,6 +16,11 @@ public class PlayerLife : MonoBehaviour
     public float timeDecreasePerSecond = 1f;
     public float deathPenalty = 10f;
 
+    [Header("Sounds")]
+    public AudioClip deathSE;   // やられ音
+    public AudioClip respawnSE; // リスポーン音
+    private AudioSource audioSource;
+
     [HideInInspector] public float currentTime;
     private bool isDead = false;
     private bool isInvincible = false;
@@ -28,6 +33,13 @@ public class PlayerLife : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         mainCollider = GetComponent<Collider2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+
+        // AudioSourceを確保（なければ追加）
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
 
         respawnPosition = transform.position;
         currentTime = totalTime;
@@ -66,7 +78,6 @@ public class PlayerLife : MonoBehaviour
         }
     }
 
-    // �� public �ɕύX
     public void ReduceTime(float amount)
     {
         currentTime = Mathf.Max(0, currentTime - amount);
@@ -87,6 +98,12 @@ public class PlayerLife : MonoBehaviour
     {
         isDead = true;
 
+        // 🎵 死亡音を再生
+        if (deathSE != null)
+        {
+            audioSource.PlayOneShot(deathSE);
+        }
+
         mainCollider.enabled = false;
         rb.simulated = false;
         spriteRenderer.enabled = false;
@@ -97,6 +114,12 @@ public class PlayerLife : MonoBehaviour
         mainCollider.enabled = true;
         rb.simulated = true;
         spriteRenderer.enabled = true;
+
+        // 🎵 リスポーン音を再生
+        if (respawnSE != null)
+        {
+            audioSource.PlayOneShot(respawnSE);
+        }
 
         isInvincible = true;
         StartCoroutine(InvincibleBlink());

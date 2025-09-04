@@ -1,18 +1,29 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System.Collections;
 
 public class PlayerAttack : MonoBehaviour
 {
     public FlameLaserSpawner laserSpawner;
     public float attackDuration = 0.2f;
-    public PlayerLife playerLife;         // © PlayerLife‚ğInspector‚ÅƒZƒbƒg
-    public float timeCostPerAttack = 10f; // © UŒ‚‚ÅŒ¸‚ç‚·ŠÔ
+    public PlayerLife playerLife;         // â† PlayerLifeã‚’Inspectorã§ã‚»ãƒƒãƒˆ
+    public float timeCostPerAttack = 10f; // â† æ”»æ’ƒã§æ¸›ã‚‰ã™æ™‚é–“
+
+    [Header("Attack Sound")]
+    public AudioClip flameSE;             // â† ç‚ã®åŠ¹æœéŸ³
+    private AudioSource audioSource;
 
     private PlayerMovement movement;
 
     private void Start()
     {
         movement = GetComponent<PlayerMovement>();
+
+        // AudioSourceã‚’å–å¾—ï¼ˆãªã‘ã‚Œã°è‡ªå‹•è¿½åŠ ï¼‰
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
     }
 
     void Update()
@@ -27,16 +38,22 @@ public class PlayerAttack : MonoBehaviour
     {
         movement.canMove = false;
 
-        // ŠÔƒQ[ƒW‚ğŒ¸‚ç‚·
+        // æ™‚é–“ã‚²ãƒ¼ã‚¸ã‚’æ¸›ã‚‰ã™
         if (playerLife != null)
         {
             playerLife.ReduceTime(timeCostPerAttack);
         }
 
-        // ‰Š‚ğo‚·
+        // ç‚ã‚’å‡ºã™
         Vector2 dir = GetLastMoveDirection();
         Vector3 spawnPos = transform.position + (Vector3)(dir * 0.5f);
         laserSpawner.Shoot(spawnPos, dir);
+
+        // ğŸ”Š åŠ¹æœéŸ³ã‚’é³´ã‚‰ã™
+        if (flameSE != null)
+        {
+            audioSource.PlayOneShot(flameSE);
+        }
 
         yield return new WaitForSeconds(attackDuration);
 
@@ -53,7 +70,7 @@ public class PlayerAttack : MonoBehaviour
         if (v > 0) return Vector2.up;
         if (v < 0) return Vector2.down;
 
-        // “ü—Í‚È‚µ‚È‚ç‰E‚ğŒü‚­
+        // å…¥åŠ›ãªã—ãªã‚‰å³ã‚’å‘ã
         return Vector2.right;
     }
 }
