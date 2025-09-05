@@ -3,37 +3,44 @@ using UnityEngine.Tilemaps;
 
 public class GameMaster : MonoBehaviour
 {
-    public Tilemap floorTilemap;          // 床Tilemap
-    public Tile exitTile;                 // Tile Paletteの出口Tile
-    public GameObject exitTriggerPrefab;  // BoxCollider2D付きTriggerプレハブ
-    private bool exitSpawned = false;
+    public static GameMaster Instance;
 
-    void Update()
+    [Header("Tilemap & Exit")]
+    public Tilemap floorTilemap;
+    public Tile exitTile;
+    public GameObject exitTriggerPrefab;
+
+    private bool exitSpawned = false;
+    private int totalEnemies = 0;
+    private int defeatedEnemies = 0;
+
+    void Awake()
     {
-        if (!exitSpawned && AllEnemiesDefeated())
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(gameObject);
+
+        totalEnemies = FindObjectsOfType<EnemyAI>().Length;
+    }
+
+    public void EnemyDefeated()
+    {
+        defeatedEnemies++;
+        Debug.Log($"敵倒した: {defeatedEnemies}/{totalEnemies}");
+
+        if (!exitSpawned && defeatedEnemies >= totalEnemies)
         {
             SpawnExit();
         }
-    }
-
-    bool AllEnemiesDefeated()
-    {
-        EnemyAI[] enemies = FindObjectsOfType<EnemyAI>();
-        foreach (var e in enemies)
-        {
-            if (e.IsAlive) return false;
-        }
-        return true;
     }
 
     void SpawnExit()
     {
         Vector3Int tilePos = FindRandomFloorTile();
 
-        // Tilemapに出口Tileを置く
         floorTilemap.SetTile(tilePos, exitTile);
 
-        // Tileの位置にTriggerを置く
         Vector3 worldPos = floorTilemap.CellToWorld(tilePos) + new Vector3(0.5f, 0.5f, 0);
         Instantiate(exitTriggerPrefab, worldPos, Quaternion.identity);
 
@@ -52,7 +59,13 @@ public class GameMaster : MonoBehaviour
             Vector3Int pos = new Vector3Int(x, y, 0);
 
             TileBase tile = floorTilemap.GetTile(pos);
-            if (tile != null) return pos; // 床タイルならOK
+            if (tile != null) return pos;
         }
+    }
+
+    public void RegisterEnemy()
+    {
+        totalEnemies++;
+        Debug.Log($"敵登録: {totalEnemies}");
     }
 }

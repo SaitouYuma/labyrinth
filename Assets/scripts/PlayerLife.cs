@@ -23,7 +23,7 @@ public class PlayerLife : MonoBehaviour
     private AudioSource audioSource;
 
     [HideInInspector] public float currentTime;
-    private bool isDead = false;
+    public bool isDead = false;
     private bool isInvincible = false;
     private SpriteRenderer spriteRenderer;
     private Collider2D mainCollider;
@@ -102,7 +102,7 @@ public class PlayerLife : MonoBehaviour
         }
     }
 
-    private IEnumerator DeathAndRespawn()
+    public IEnumerator DeathAndRespawn()
     {
         isDead = true;
 

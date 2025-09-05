@@ -1,46 +1,48 @@
-using UnityEngine;
+﻿using UnityEngine;
+using Pathfinding;
 
+[RequireComponent(typeof(AIPath))]
+[RequireComponent(typeof(Seeker))]
+[RequireComponent(typeof(Rigidbody2D))]
 public class EnemyAI : MonoBehaviour
 {
-    public float speed = 2f;
-    public LayerMask wallLayer;
     public bool IsAlive = true;
+    public Transform player;
 
-    private Transform player;
-    private bool isChasing = false;
-    private Rigidbody2D rb;
+    private AIPath aiPath;
 
     void Start()
     {
-        player = GameObject.FindGameObjectWithTag("Player")?.transform;
-        rb = GetComponent<Rigidbody2D>();
+        aiPath = GetComponent<AIPath>();
+        if (player == null)
+            player = GameObject.FindWithTag("Player")?.transform;
+
+        // 登録処理
+        if (GameMaster.Instance != null)
+            GameMaster.Instance.RegisterEnemy();
     }
 
-    void FixedUpdate()
+
+    void Update()
     {
-        if (!isChasing || !IsAlive || player == null) return;
+        if (!IsAlive || player == null) return;
 
-        Vector2 direction = (player.position - transform.position).normalized;
+        aiPath.destination = player.position;
 
-        RaycastHit2D hit = Physics2D.Raycast(rb.position, direction, 0.5f, wallLayer);
-        if (hit.collider != null)
-        {
-            Vector2 perp = Vector2.Perpendicular(direction);
-            direction = (Random.value > 0.5f) ? perp : -perp;
-        }
-
-        rb.MovePosition(rb.position + direction * speed * Time.fixedDeltaTime);
-
-        if (direction.x > 0) transform.localScale = new Vector3(1, 1, 1);
-        else if (direction.x < 0) transform.localScale = new Vector3(-1, 1, 1);
+        // 左右反転
+        if (aiPath.desiredVelocity.x >= 0.01f)
+            transform.localScale = new Vector3(1, 1, 1);
+        else if (aiPath.desiredVelocity.x <= -0.01f)
+            transform.localScale = new Vector3(-1, 1, 1);
     }
-
-    public void StartChase() { isChasing = true; }
-    public void StopChase() { isChasing = false; }
 
     public void Die()
     {
+        if (!IsAlive) return;
         IsAlive = false;
         gameObject.SetActive(false);
+
+        if (GameMaster.Instance != null)
+            GameMaster.Instance.EnemyDefeated();
     }
 }
