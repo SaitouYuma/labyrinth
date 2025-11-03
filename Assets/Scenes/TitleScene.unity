@@ -1009,7 +1009,8 @@ MonoBehaviour:
   _seSource: {fileID: 1809480950}
   _bgmClips:
   - {fileID: 8300000, guid: 5fca870813ddbe94fa2165ab3d745009, type: 3}
-  _seClips: []
+  _seClips:
+  - {fileID: 8300000, guid: f1736337eb30d5d4e9d233bbd76e74e0, type: 3}
 --- !u!1 &791439533
 GameObject:
   m_ObjectHideFlags: 0

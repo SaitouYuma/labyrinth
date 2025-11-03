@@ -11,6 +11,8 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 movement;
     private string lastDirection = "Down"; // 最後の向きを記録
 
+    [HideInInspector] public Vector2 LastMoveDirection = Vector2.right;
+
     [HideInInspector] public bool canMove = true; // 攻撃中に移動停止用
 
     void Start()
@@ -24,9 +26,6 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        // ---------------------------
-        // 攻撃中は入力スキップ
-        // ---------------------------
         if (!canMove)
         {
             animator.SetBool("isWalking", false);
@@ -34,9 +33,7 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        // ---------------------------
-        // 通常の入力処理
-        // ---------------------------
+        // 入力取得
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
 
@@ -44,6 +41,9 @@ public class PlayerMovement : MonoBehaviour
         {
             animator.SetBool("isWalking", true);
 
+            // ---------------------------
+            // 向きの判定
+            // ---------------------------
             if (Mathf.Abs(movement.x) > Mathf.Abs(movement.y))
             {
                 lastDirection = (movement.x > 0) ? "Right" : "Left";
@@ -62,6 +62,11 @@ public class PlayerMovement : MonoBehaviour
 
                 spriteRenderer.flipX = false;
             }
+
+            // ---------------------------
+            // 最後に動いた方向をベクトルで保存
+            // ---------------------------
+            LastMoveDirection = movement.normalized;
         }
         else
         {
@@ -69,6 +74,7 @@ public class PlayerMovement : MonoBehaviour
             ApplyLastDirection(); // 停止中も向き維持
         }
     }
+
 
     void FixedUpdate()
     {
