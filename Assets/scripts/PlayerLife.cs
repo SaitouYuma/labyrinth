@@ -24,7 +24,6 @@ public class PlayerLife : MonoBehaviour
 
     [HideInInspector] public float currentTime;
     public bool isDead = false;
-    private bool isInvincible = false;
     private SpriteRenderer spriteRenderer;
     private Collider2D mainCollider;
     private Rigidbody2D rb;
@@ -47,20 +46,7 @@ public class PlayerLife : MonoBehaviour
         UpdateMeter();
     }
 
-    void Update()
-    {
-        if (!isDead)
-        {
-            currentTime -= timeDecreasePerSecond * Time.deltaTime;
-            currentTime = Mathf.Max(0, currentTime);
-            UpdateMeter();
-
-            if (currentTime <= 0)
-            {
-                GameOver();
-            }
-        }
-    }
+    
 
     private void UpdateMeter()
     {
@@ -70,37 +56,9 @@ public class PlayerLife : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.CompareTag("Enemy") && !isInvincible && !isDead)
-        {
-            ReduceTime(deathPenalty);
-            StartCoroutine(DeathAndRespawn());
-        }
-    }
+    
 
-    public void ReduceTime(float amount)
-    {
-        currentTime = Mathf.Max(0, currentTime - amount);
-        UpdateMeter();
-
-        if (currentTime <= 0)
-        {
-            GameOver();
-        }
-    }
-
-    private void GameOver()
-    {
-        Time.timeScale = 0;
-
-        // フェードアウト開始
-        ScreenFader fader = FindObjectOfType<ScreenFader>();
-        if (fader != null)
-        {
-            fader.FadeOutAndLoad("GameOverScene");
-        }
-    }
+    
 
     public IEnumerator DeathAndRespawn()
     {
@@ -129,12 +87,12 @@ public class PlayerLife : MonoBehaviour
             audioSource.PlayOneShot(respawnSE);
         }
 
-        isInvincible = true;
+        
         StartCoroutine(InvincibleBlink());
 
         yield return new WaitForSeconds(invincibleTime);
 
-        isInvincible = false;
+        
         spriteRenderer.enabled = true;
         isDead = false;
     }

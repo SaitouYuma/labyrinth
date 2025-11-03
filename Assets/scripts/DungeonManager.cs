@@ -1,9 +1,9 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class GameMaster : MonoBehaviour
+public class DungeonManager : MonoBehaviour
 {
-    public static GameMaster Instance;
+    public static DungeonManager Instance;
 
     [Header("Tilemap & Exit")]
     public Tilemap floorTilemap;

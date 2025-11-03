@@ -38,11 +38,11 @@ public class PlayerAttack : MonoBehaviour
     {
         movement.canMove = false;
 
-        // 時間ゲージを減らす
-        if (playerLife != null)
-        {
-            playerLife.ReduceTime(timeCostPerAttack);
-        }
+        //// 時間ゲージを減らす
+        //if (playerLife != null)
+        //{
+        //    playerLife.ReduceTime(timeCostPerAttack);
+        //}
 
         // 炎を出す
         Vector2 dir = GetLastMoveDirection();

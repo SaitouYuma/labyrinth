@@ -4,7 +4,7 @@ using UnityEngine;
 public class PatrolEnemy : MonoBehaviour
 {
     public float speed = 2f;
-    public float sidestepChance = 0.2f; // ‰¡‚Éˆí‚ê‚éŠm—¦
+    public float sidestepChance = 0.2f; // ï¿½ï¿½ï¿½Éˆï¿½ï¿½ï¿½mï¿½ï¿½
 
     private Vector2 direction = Vector2.right;
     private Rigidbody2D rb;
@@ -14,14 +14,14 @@ public class PatrolEnemy : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
 
-        // GameMaster ‚É“G“o˜^
-        if (GameMaster.Instance != null)
-            GameMaster.Instance.RegisterEnemy();
+        // GameMaster ï¿½É“Gï¿½oï¿½^
+        if (DungeonManager.Instance != null)
+            DungeonManager.Instance.RegisterEnemy();
     }
 
     void Update()
     {
-        // ‰¡Œü‚«‚Ì”½“]
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì”ï¿½ï¿½]
         if (direction.x > 0.01f)
             transform.localScale = new Vector3(1, 1, 1);
         else if (direction.x < -0.01f)
@@ -32,13 +32,13 @@ public class PatrolEnemy : MonoBehaviour
     {
         if (!isAlive) return;
 
-        rb.velocity = direction * speed;
+        rb.linearVelocity = direction * speed;
 
-        // •Ç”»’è
+        // ï¿½Ç”ï¿½ï¿½ï¿½
         RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, 0.6f, LayerMask.GetMask("Wall"));
         if (hit.collider != null)
         {
-            // ’áŠm—¦‚Å‰¡‚Éˆí‚ê‚é
+            // ï¿½ï¿½mï¿½ï¿½ï¿½Å‰ï¿½ï¿½Éˆï¿½ï¿½ï¿½
             if (Random.value < sidestepChance)
             {
                 if (direction == Vector2.up || direction == Vector2.down)
@@ -48,11 +48,11 @@ public class PatrolEnemy : MonoBehaviour
             }
             else
             {
-                direction = -direction; // ”½“]
+                direction = -direction; // ï¿½ï¿½ï¿½]
             }
         }
 
-        // ã‰º¶‰E‚Ì‚İ‚É§–ñ
+        // ï¿½ã‰ºï¿½ï¿½ï¿½Eï¿½Ì‚İ‚Éï¿½ï¿½ï¿½
         if (Mathf.Abs(direction.x) > 0.01f) direction.y = 0;
         if (Mathf.Abs(direction.y) > 0.01f) direction.x = 0;
     }
@@ -63,21 +63,20 @@ public class PatrolEnemy : MonoBehaviour
 
         if (other.CompareTag("Player"))
         {
-            // ƒvƒŒƒCƒ„[‚ÌŠÔ‚ğŒ¸‚ç‚µA€–Sˆ—ŠJn
-            PlayerLife playerLife = other.GetComponent<PlayerLife>();
-            if (playerLife != null && !playerLife.isDead)
-            {
-                playerLife.ReduceTime(playerLife.deathPenalty);
-                StartCoroutine(playerLife.DeathAndRespawn());
-            }
+            
+            //PlayerLife playerLife = other.GetComponent<PlayerLife>();
+            //if (playerLife != null && !playerLife.isDead)
+            //{
+            //    playerLife.ReduceTime(playerLife.deathPenalty);
+            //    StartCoroutine(playerLife.DeathAndRespawn());
+            //}
 
-            // “G‚Í€‚È‚È‚¢iG‚ê‚½‚ç“|‚·d—l‚È‚ç‚±‚±‚Íc‚·j
-            // Die();
+            
         }
 
         if (other.CompareTag("PlayerAttack"))
         {
-            Die(); // UŒ‚‚³‚ê‚½‚ç“G‚Í“|‚ê‚é
+            Die(); // ï¿½Uï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ï¿½ï¿½Gï¿½Í“|ï¿½ï¿½ï¿½
         }
     }
 
@@ -88,8 +87,8 @@ public class PatrolEnemy : MonoBehaviour
         isAlive = false;
         gameObject.SetActive(false);
 
-        // GameMaster ‚É’Ê’m
-        if (GameMaster.Instance != null)
-            GameMaster.Instance.EnemyDefeated();
+        // GameMaster ï¿½É’Ê’m
+        if (DungeonManager.Instance != null)
+            DungeonManager.Instance.EnemyDefeated();
     }
 }
